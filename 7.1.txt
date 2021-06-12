@@ -1,0 +1,13 @@
+7.1
+a) What is the defining property od a Gaussian noise?
+The defining property of Gaussian noise is that its probability density function is normally distributed (i.e. forms a Gaussian bell curve, named after the German mathematician Gauss), which is why it is often referred to as normally distributed noise. 
+The probability density function can be described mathematically as an e-function whose negative exponent includes both the expected value and the variance, and which is normalized by a prefactor so that the content under the curve always equals 1.
+This noise often occurs in practice and can also be generated using a random number generator for testing purposes. 
+
+b) What does a low-pass filter do in general?
+Generally, a low-pass filter only allows frequencies to pass up to a certain limit and cuts off frequencies above this limit, called the cutoff frequency. 
+In practice, however, the actual effect depends on the type of filter and its characteristics, such as the cutoff frequency sharpness and the step response.
+
+c) Is a moving average filter a low-pass or a high-pass filter? Why?
+Moving averade is a convolution filter used in the time domain, e.g. smoothing.This is because the moving average determines the average of several points and outputs it, i.e. the resulting signal is smoothed and outliers are removed.
+However, the main characteristic of the filter is not filtering out high frequencies, but smoothening over time, which is why moving average does not function as a good low-pass filter. 
