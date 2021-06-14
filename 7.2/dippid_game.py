@@ -1,7 +1,9 @@
 from DIPPID import SensorUDP
 import sys
+import random
 from enum import Enum
 from PyQt5 import QtWidgets, QtCore, Qt, QtGui
+from PyQt5.QtCore import QTimer
 
 
 class ApplicationState(Enum):
@@ -16,17 +18,41 @@ class FirstGame(QtWidgets.QWidget):
     SCREEN_WIDTH = 1200
     SCREEN_HEIGHT = 800
     SPACESHIP_DIM = 40
+    TARGET_DIM = 60
+    TARGET_MIN_HEIGHT = 600
+    TARGETS_NUM = 3
     SPACESHIP_Y = (int(SCREEN_HEIGHT) - int(SPACESHIP_DIM))
 
     spaceship_x = (SCREEN_WIDTH / 2)
     sensor = ()
+    targets_x = []
+    targets_y = []
+    application_state = ()
+    targets_printed = ()
 
     def __init__(self):
         super().__init__()
         self.application_state = ApplicationState.EXPLANATION
         self.sensor = SensorUDP(self.PORT)
+        self.sensor.register_callback('button_1', self.handle_button_press)
         self.initUI()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.move_spaceship)
+        self.timer.start(10)
         self.show()
+
+    def handle_button_press(self, data):
+        if int(data) == 0:
+            print('button released')
+            return
+        else:
+            print('button pressed')
+            if self.application_state == ApplicationState.EXPLANATION:
+                self.application_state = ApplicationState.GAME
+
+            if self.application_state == ApplicationState.FINISHED:
+                self.application_state = ApplicationState.GAME
+        self.update()
 
     def initUI(self):
         self.setGeometry(self.SCREEN_START, self.SCREEN_START, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
@@ -53,16 +79,33 @@ class FirstGame(QtWidgets.QWidget):
             return
 
         self.draw_spaceship(painter)
+        self.draw_targets(painter)
+
+    def draw_targets(self, painter):
+        if not self.targets_printed:
+            for i in range(self.TARGETS_NUM):
+                self.targets_x.append(random.randint(0, int(self.SCREEN_WIDTH) - int(self.TARGET_DIM)))
+                self.targets_y.append(random.randint(0, int(self.TARGET_MIN_HEIGHT)))
+                self.targets_printed = True
+
+        painter.setPen(Qt.QPen(QtCore.Qt.darkBlue, 2, QtCore.Qt.SolidLine))
+        painter.setBrush(Qt.QBrush(QtCore.Qt.red))
+        for i in range(self.TARGETS_NUM):
+            painter.drawRect(int(self.targets_x[i]), int(self.targets_y[i]), int(self.TARGET_DIM), int(self.TARGET_DIM))
 
     def draw_spaceship(self, painter):
         painter.setPen(Qt.QPen(QtCore.Qt.darkBlue, 2, QtCore.Qt.SolidLine))
         painter.setBrush(Qt.QBrush(QtCore.Qt.blue))
         painter.drawRect(int(self.spaceship_x), int(self.SPACESHIP_Y), int(self.SPACESHIP_DIM), int(self.SPACESHIP_DIM))
 
-    def moveSpaceship(self):
-        if self.sensor.has_capability('accelerometer'):
-            accelerometer = self.sensor.get_value('accelerometer')['x']
-            self.spaceship_x = (self.spaceship_x - int(accelerometer)*10)
+    def move_spaceship(self):
+        if self.sensor.has_capability('gravity'):
+            sensor_value = self.sensor.get_value('gravity')['x']
+            new_x_pos = self.spaceship_x - int(sensor_value)
+            if (new_x_pos > 0) and (new_x_pos < (self.SCREEN_WIDTH - self.SPACESHIP_DIM)):
+                self.spaceship_x = new_x_pos
+
+        self.update()
 
 
 def main():
