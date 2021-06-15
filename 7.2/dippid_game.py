@@ -24,7 +24,7 @@ class FirstGame(QtWidgets.QWidget):
     SPACESHIP_Y = (int(SCREEN_HEIGHT) - int(SPACESHIP_DIM))
     TARGET_DIM = 60
     TARGET_MIN_HEIGHT = 600
-    TARGETS_NUM = 1
+    TARGETS_NUM = 7
     BULLET_DIM = 10
 
     spaceship_x = (SCREEN_WIDTH / 2)
@@ -86,7 +86,7 @@ class FirstGame(QtWidgets.QWidget):
             painter.setPen(QtCore.Qt.black)
             painter.setFont(Qt.QFont('Decorative', 30))
             painter.drawText(event.rect(), QtCore.Qt.AlignCenter,
-                             "Get ready to play!\n\n Take your phone sideways \n by tilting it forward and backward \n you "
+                             "Get ready to play!\n\n By tilting your phone sideways \n you "
                              "can control the spaceship, \n by pressing button 2 you can shoot!\n\n"
                              "Press button 1 when you are ready to start!")
             self.bullet_counter = 0
